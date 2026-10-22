@@ -1,0 +1,209 @@
+COMPILER FRONT END AND BACK END — PSEUDOCODE
+
+Sample program:
+while (m < n * 4)
+{
+    r = 16 * 5;
+    s = x * y + z;
+    t = m + s;
+}
+
+(a) LEX SPECIFICATION — TOKEN RECOGNITION
+BEGIN
+    Define pattern for keyword: while
+    Define pattern for identifiers
+    Define pattern for integer numbers
+    Define patterns for relational operators: <, >, <=, >=, ==, !=
+    Define patterns for assignment and arithmetic operators: =, +, -, *, /
+    Define patterns for symbols: (, ), {, }, ;
+    Ignore spaces, tabs, and newlines
+    Return the recognized token
+END
+
+(b) YACC SPECIFICATION — SYNTAX CHECKING
+BEGIN
+    Define tokens received from LEX
+    Define grammar rules for:
+        Program
+        Statement list
+        While statement
+        Block
+        Assignment statement
+        Condition
+        Arithmetic expression
+
+    Read tokens from LEX
+    Check whether the input follows the grammar
+
+    If the input matches the grammar:
+        Print "Valid syntax"
+    Else:
+        Print "Syntax error"
+END
+
+(c) SDT — THREE-ADDRESS CODE GENERATION
+BEGIN
+    Initialize temporary variable counter
+    Initialize label counter
+    Open output file tac.txt
+
+    For each arithmetic operation:
+        Generate a new temporary variable
+        Emit one three-address instruction
+
+    For each assignment:
+        Generate code for the expression
+        Assign the result to the left-hand variable
+
+    For each while loop:
+        Generate loop-start label
+        Generate code for the loop condition
+        Generate conditional jump to the body
+        Generate jump to the loop exit
+        Generate loop-body label
+        Generate code for statements inside the body
+        Generate jump back to the loop-start label
+        Generate loop-exit label
+
+    Write generated code to tac.txt
+END
+
+Example:
+    s = x * y + z
+
+Three-address code:
+    t1 = x * y
+    t2 = t1 + z
+    s = t2
+
+(d) CODE OPTIMIZATION — LOOP-INVARIANT CODE MOTION
+BEGIN
+    Read three-address code from tac.txt
+    Identify the loop-start label, loop body, and loop-exit label
+
+    For each computation inside the loop:
+        Check whether its operands change inside the loop
+
+        If the operands do not change:
+            Mark the computation as loop-invariant
+            Check that dependencies are preserved
+            Move the computation before the loop
+
+    Preserve the original program's behavior
+    Write optimized code to optimized.txt
+END
+
+Example:
+Before optimization:
+    L1:
+        t1 = 16 * 5
+        r = t1
+        goto L1
+
+After optimization:
+    t1 = 16 * 5
+    L1:
+        r = t1
+        goto L1
+
+Note:
+    Only move a computation when it is safe to do so.
+    Variables assigned inside the loop may not be treated as invariant.
+
+(e) BACKEND — TARGET CODE GENERATION
+BEGIN
+    Read intermediate code from optimized.txt
+    For each instruction:
+
+        If it is an arithmetic operation:
+            Load operands into registers
+            Perform the operation
+            Store the result
+
+        Else if it is an assignment:
+            Load the source value
+            Store it in the destination variable
+
+        Else if it is a conditional jump:
+            Load and compare operands
+            Generate the appropriate conditional branch
+
+        Else if it is an unconditional jump:
+            Generate a jump instruction
+
+        Else if it is a label:
+            Generate the target label
+
+    Write target instructions to target.txt
+END
+
+Example:
+Three-address code:
+    t1 = x * y
+    s = t1
+
+Target code:
+    LOAD R1, x
+    MUL R1, y
+    STORE t1, R1
+    LOAD R1, t1
+    STORE s, R1
+
+(f) INTEGRATION AND VERIFICATION
+BEGIN
+    Save the LEX code in loop.l
+    Save the YACC code in loop.y
+    Save the sample source program in input.c
+    Save optimizer code in optimize.c
+    Save backend code in backend.c
+
+    Generate the YACC parser and header
+    Generate the LEX scanner
+    Compile the parser and scanner
+    Run the compiler using input.c
+    Verify tac.txt
+
+    Compile and run the optimizer
+    Verify optimized.txt
+
+    Compile and run the backend
+    Verify target.txt
+
+    If syntax is invalid:
+        Display syntax error
+END
+
+SIMPLIFIED EXECUTION COMMANDS
+    bison -d loop.y
+    flex loop.l
+    gcc loop.tab.c lex.yy.c -o compiler
+    ./compiler < input.c
+    cat tac.txt
+
+    gcc optimize.c -o optimize
+    ./optimize
+    cat optimized.txt
+
+    gcc backend.c -o backend
+    ./backend
+    cat target.txt
+
+SHORT VERSION TO MEMORIZE
+1. LEX: Define token patterns and return recognized tokens.
+2. YACC: Define grammar rules and validate syntax.
+3. SDT: Generate temporaries, labels, assignments, and jumps.
+4. Optimization: Find loop-invariant computations and move them outside the loop safely.
+5. Backend: Convert intermediate instructions into target instructions.
+6. Integration: Compile, execute, and verify each module's output.
+
+If skipping optimization in a shortened workflow:
+    bison -d loop.y
+    flex loop.l
+    gcc loop.tab.c lex.yy.c -o compiler
+    ./compiler < input.c
+    cat tac.txt
+    gcc backend.c -o backend
+    ./backend
+    cat target.txt
+
+In this shortened workflow, backend.c must read tac.txt directly instead of optimized.txt.
