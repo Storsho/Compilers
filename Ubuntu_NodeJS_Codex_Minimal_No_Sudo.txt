@@ -1,0 +1,46 @@
+MINIMAL UBUNTU x86_64 GUIDE: NODE.JS + OPENAI CODEX
+=====================================================
+
+No sudo required. This installs everything in your home directory.
+
+1) Check architecture
+    uname -m
+
+Continue only if it prints: x86_64
+
+2) Download and extract Node.js v26.13.0
+    mkdir -p ~/.local/opt
+    cd ~/Downloads
+    wget https://nodejs.org/dist/v26.13.0/node-v26.13.0-linux-x64.tar.xz
+    tar -xf node-v26.13.0-linux-x64.tar.xz -C ~/.local/opt
+    mv ~/.local/opt/node-v26.13.0-linux-x64 ~/.local/opt/node
+
+3) Add Node.js to PATH
+Run:
+    echo 'export PATH="$HOME/.local/opt/node/bin:$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    source ~/.bashrc
+
+4) Check Node.js and npm
+    node -v
+    npm -v
+
+Node.js should print: v26.13.0
+
+5) Install OpenAI Codex CLI without sudo
+    mkdir -p ~/.local/bin ~/.npm-global
+    npm config set prefix "$HOME/.npm-global"
+    echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc
+    source ~/.bashrc
+    npm install -g @openai/codex@latest
+
+6) Check and start Codex
+    codex --version
+    cd /path/to/your/project
+    codex
+
+Replace /path/to/your/project with the folder you want Codex to work in.
+Follow the on-screen instructions to sign in.
+
+If wget is missing or the download is blocked, ask the system administrator
+for an approved way to obtain the file. Do not use sudo or try to bypass
+managed-device restrictions.
